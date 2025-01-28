@@ -102,13 +102,19 @@
     </div>
 
     <script>
-        let totalWater = 0;
-        let history = [];
+        let totalWater = parseInt(localStorage.getItem('totalWater')) || 0;
+        let history = JSON.parse(localStorage.getItem('history')) || [];
 
         const waterTally = document.getElementById('waterTally');
         const waterInput = document.getElementById('waterInput');
         const addButton = document.getElementById('addButton');
         const undoButton = document.getElementById('undoButton');
+
+        function updateTally() {
+            waterTally.textContent = `${totalWater} ML`;
+            localStorage.setItem('totalWater', totalWater);
+            localStorage.setItem('history', JSON.stringify(history));
+        }
 
         addButton.addEventListener('click', () => {
             const amount = parseInt(waterInput.value);
@@ -133,8 +139,10 @@
             }
         });
 
-        function updateTally() {
-            waterTally.textContent = `${totalWater} ML`;
+        // Initialize the UI with stored values
+        updateTally();
+        if (history.length > 0) {
+            undoButton.disabled = false;
         }
     </script>
 </body>
