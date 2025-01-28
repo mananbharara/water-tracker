@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f8ff;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .tally {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #0077ff;
+        }
+
+        input[type="number"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            padding: 10px;
+            width: calc(100% - 22px);
+            margin-bottom: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button.add {
+            background-color: #0077ff;
+            color: white;
+        }
+
+        button.undo {
+            background-color: #ff6b6b;
+            color: white;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .tally {
+                font-size: 1.5rem;
+            }
+
+            button {
+                font-size: 0.9rem;
+            }
+
+            input[type="number"] {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Water Tracker</h1>
+        <div class="tally" id="waterTally">0 ML</div>
+        <input type="number" id="waterInput" placeholder="Enter water in ML" />
+        <button class="add" id="addButton">Add</button>
+        <button class="undo" id="undoButton" disabled>Undo</button>
+    </div>
+
+    <script>
+        let totalWater = 0;
+        let history = [];
+
+        const waterTally = document.getElementById('waterTally');
+        const waterInput = document.getElementById('waterInput');
+        const addButton = document.getElementById('addButton');
+        const undoButton = document.getElementById('undoButton');
+
+        addButton.addEventListener('click', () => {
+            const amount = parseInt(waterInput.value);
+
+            if (!isNaN(amount) && amount > 0) {
+                totalWater += amount;
+                history.push(amount);
+                updateTally();
+                waterInput.value = '';
+                undoButton.disabled = false;
+            }
+        });
+
+        undoButton.addEventListener('click', () => {
+            if (history.length > 0) {
+                const lastAmount = history.pop();
+                totalWater -= lastAmount;
+                updateTally();
+                if (history.length === 0) {
+                    undoButton.disabled = true;
+                }
+            }
+        });
+
+        function updateTally() {
+            waterTally.textContent = `${totalWater} ML`;
+        }
+    </script>
+</body>
+</html>
