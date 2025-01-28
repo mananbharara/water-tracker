@@ -32,10 +32,35 @@
         }
 
         .tally {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .tally .amount {
             font-size: 2rem;
             font-weight: bold;
             margin: 20px 0;
             color: #0077ff;
+        }
+
+        .previous-days {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .previous-days h2 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        .previous-days ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .previous-days li {
+            font-size: 1rem;
+            margin-bottom: 5px;
         }
 
         input[type="number"] {
@@ -78,7 +103,7 @@
                 font-size: 1.5rem;
             }
 
-            .tally {
+            .tally .amount {
                 font-size: 1.5rem;
             }
 
@@ -95,25 +120,55 @@
 <body>
     <div class="container">
         <h1>Water Tracker</h1>
-        <div class="tally" id="waterTally">0 ML</div>
+        <div class="tally">
+            <div>Today's water intake:</div>
+            <div class="amount" id="waterTally">0 ML</div>
+        </div>
         <input type="number" id="waterInput" placeholder="Enter water in ML" />
         <button class="add" id="addButton">Add</button>
         <button class="undo" id="undoButton" disabled>Undo</button>
+        <div class="previous-days">
+            <h2>Previous Days' Intake</h2>
+            <ul id="previousDaysList"></ul>
+        </div>
     </div>
 
     <script>
         let totalWater = parseInt(localStorage.getItem('totalWater')) || 0;
         let history = JSON.parse(localStorage.getItem('history')) || [];
+        let previousDays = JSON.parse(localStorage.getItem('previousDays')) || [];
 
         const waterTally = document.getElementById('waterTally');
         const waterInput = document.getElementById('waterInput');
         const addButton = document.getElementById('addButton');
         const undoButton = document.getElementById('undoButton');
+        const previousDaysList = document.getElementById('previousDaysList');
 
         function updateTally() {
             waterTally.textContent = `${totalWater} ML`;
             localStorage.setItem('totalWater', totalWater);
             localStorage.setItem('history', JSON.stringify(history));
+        }
+
+        function updatePreviousDays() {
+            previousDaysList.innerHTML = '';
+            previousDays.forEach((day, index) => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `Day ${index + 1}: ${day} ML`;
+                previousDaysList.appendChild(listItem);
+            });
+            localStorage.setItem('previousDays', JSON.stringify(previousDays));
+        }
+
+        function endOfDayReset() {
+            if (totalWater > 0) {
+                previousDays.push(totalWater);
+                updatePreviousDays();
+                totalWater = 0;
+                history = [];
+                updateTally();
+                undoButton.disabled = true;
+            }
         }
 
         addButton.addEventListener('click', () => {
@@ -141,9 +196,13 @@
 
         // Initialize the UI with stored values
         updateTally();
+        updatePreviousDays();
         if (history.length > 0) {
             undoButton.disabled = false;
         }
+
+        // Uncomment the following line to simulate the end of day reset:
+        // endOfDayReset();
     </script>
 </body>
 </html>
